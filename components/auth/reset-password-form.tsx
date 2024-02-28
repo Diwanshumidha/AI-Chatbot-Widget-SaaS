@@ -18,10 +18,11 @@ import { ResetPasswordSchema } from "@/schemas";
 import { FormError } from "./form-error";
 import { FormSuccess } from "./form-success";
 import { useState } from "react";
+import { resetPassword } from "@/actions/reset-password";
 
 const ResetPasswordForm = () => {
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -30,22 +31,28 @@ const ResetPasswordForm = () => {
     },
   });
 
-    const onSubmit = (data: z.infer<typeof ResetPasswordSchema>) => {
-        setError("");
-        setSuccess("");
-        console.log(data);
-    };
-
-
+  const onSubmit = (email: z.infer<typeof ResetPasswordSchema>) => {
+    setError("");
+    setSuccess("");
+    console.log(email);
+    resetPassword(email).then((response) => {
+      if (response.error) {
+        setError(response.error);
+      }
+      if (response.success) {
+        setSuccess(response.success);
+      }
+    });
+  };
 
   return (
     <CardWrapper
-    headerLabel="Reset your password"
-    title="Forgot your password? No worries, we got you."
-    backButtonHref="/auth/login"
-    backButtonLabel="Remembered your password? Login here."
+      headerLabel="Reset your password"
+      title="Forgot your password? No worries, we got you."
+      backButtonHref="/auth/login"
+      backButtonLabel="Remembered your password? Login here."
     >
-  <Form {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <FormField
@@ -55,17 +62,12 @@ const ResetPasswordForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                    
-                      placeholder="john.doe@example.com"
-                    />
+                    <Input {...field} placeholder="john.doe@example.com" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />

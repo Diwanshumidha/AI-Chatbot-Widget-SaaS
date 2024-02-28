@@ -35,6 +35,7 @@ export const generatePasswordResetToken = async (email: string) => {
 
         const existingToken = await getPasswordResetTokenByEmail(email)
 
+        // delete if password token exists
         if(existingToken) {
                 await database.passwordResetToken.delete({
                         where: {
@@ -43,6 +44,7 @@ export const generatePasswordResetToken = async (email: string) => {
                 });
         }
 
+        // Create a new password reset token
         const passwordResetToken = await database.passwordResetToken.create({
                 data: {
                         email,

@@ -13,7 +13,6 @@ export const getUserByEmail = async (email:string) => {
     } catch (error) {
         return null
     }
-
 }
 
 export const getUserById = async (id:string) => {
