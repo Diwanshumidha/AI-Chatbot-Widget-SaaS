@@ -38,3 +38,21 @@ export const NewPasswordSchema = z.object({
         message: 'Password must be at least 6 characters long'
     })
 })
+
+export const ChatbotSchema = z.object({
+    name: z.string().min(1, {
+        message: 'Name is required'
+    }),
+    description: z.string().min(1, {
+        message: 'Description is required'
+    }),
+    colorScheme: z.string().min(1, {
+        message: 'Color Scheme is required'
+    }),
+    logo: z.string().min(1, {
+        message: 'Logo is required'
+    }),
+    knowledgeBase: z.string().min(1, {
+        message: 'Knowledge Base is required'
+    }),
+    })

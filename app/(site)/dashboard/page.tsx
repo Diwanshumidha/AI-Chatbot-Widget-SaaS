@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import Widget from '@/components/ai-assistant/widget';
 
 const DashboardPage = async () => {
     const session = await auth();
@@ -8,8 +9,9 @@ const DashboardPage = async () => {
       <p>{session?.user.name}</p>
       <p>{session?.user.isOAuth}</p>
       {JSON.stringify(session, null, 2)}
+      <Widget />
       </div>
   )
 }
 
-export default DashboardPage
+export default DashboardPage;
