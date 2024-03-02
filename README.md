@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Chatty (Ai Chatbot Generator)
+
+See the Project Tutorial and Live Stream [here](https://www.youtube.com/@brettwestwooddeveloper/streams)
+
+This Project Helps You To add a custom chatbot widget to your website so your customer can get quick customer helpline from a chatbot that is powered by open ai and can be customized with your data
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to get started with the project:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Clone the repository:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   git clone https://github.com/bwestwood11/AI-Chatbot-Widget-SaaS.git
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. Copy the `.env.example` file to `.env`:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   cp .env.example .env
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Obtain you DATABASE_URL from [MONGO DB](https://www.mongodb.com/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+5. Obtain your GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET from [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
 
-## Deploy on Vercel
+6. Obtain your RESEND_API_KEY from [Resend](https://resend.com/).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+7. Generate a secret token `NEXTAUTH_SECRET` using the following command:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   Update your `.env` file with the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, and the generated `NEXTAUTH_SECRET`.
+
+## Usage
+
+...
+
+## License
+
+...
