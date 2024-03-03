@@ -21,6 +21,7 @@ import { ChatbotSchema } from "@/schemas";
 import ChatbotPrototype from "./ChatbotPrototype";
 import { ColorPicker, useColor } from "react-color-palette";
 import "react-color-palette/css";
+import { redirect } from "next/navigation";
 
 const ChatbotForm = () => {
   const [loading, setLoading] = useState(false);
@@ -35,14 +36,24 @@ const ChatbotForm = () => {
 
     defaultValues: {
       name: "",
-      description: "",
+      instructions: "",
       welcomeMessage: "",
       colorScheme: {
-        hex: "",
-        rgb: { r: 0, g: 0, b: 0, a: 1 },
-        hsv: { h: 0, s: 0, v: 0, a: 1 },
+        hex: "#f97316",
+        rgb: {
+          r: 249,
+          g: 115,
+          b: 22,
+          a: 1,
+        },
+        hsv: {
+          h: 24.581497797356832,
+          s: 91.16465863453816,
+          v: 97.6470588235294,
+          a: 1,
+        },
       },
-      // logo: "",
+      logo: undefined,
       knowledgeBase: "",
     },
   });
@@ -62,7 +73,7 @@ const ChatbotForm = () => {
 
   const name = watch("name");
   // const logo = watch("logo");
-  const description = watch("description");
+  const instructions = watch("instructions");
   const welcomeMessage = watch("welcomeMessage");
   const colorScheme = watch("colorScheme");
   const knowledgeBase = watch("knowledgeBase");
@@ -82,13 +93,14 @@ const ChatbotForm = () => {
           setError(data.error);
         } else {
           setSuccess(data.success);
+          redirect("/dashboard/assistant");
         }
       });
   };
 
   return (
-    <div className="w-full pt-10 flex md:flex-row flex-col">
-      <div className="basis-1/2 px-16">
+    <div className="w-full pt-10 flex lg:flex-row flex-col justify-center container mx-auto">
+      <div className="basis-1/2 px-16 flex-1">
         <h1 className="text-3xl font-semibold text-center mb-6">
           Create Your Chatbot in just a few steps
         </h1>
@@ -118,7 +130,7 @@ const ChatbotForm = () => {
               />
               <FormField
                 control={form.control}
-                name="description"
+                name="instructions"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Describe your chatbot</FormLabel>
@@ -176,7 +188,7 @@ const ChatbotForm = () => {
                   </FormItem>
                 )}
               />
-              {/* <FormField
+              <FormField
                 control={form.control}
                 name="logo"
                 render={({ field }) => (
@@ -196,7 +208,7 @@ const ChatbotForm = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              /> */}
+              />
               <FormField
                 control={form.control}
                 name="knowledgeBase"
@@ -232,7 +244,7 @@ const ChatbotForm = () => {
           </form>
         </Form>
       </div>
-      <div className="basis-1/2">
+      <div className="basis-1/2 flex-1 flex justify-center">
         <ChatbotPrototype
           name={name}
           colorScheme={colorScheme.hex}

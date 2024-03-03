@@ -3,7 +3,7 @@ import ChatbotForm from "@/components/creating-chatbot/ChatbotForm"
 
 const CreateChatbotPage = () => {
   return (
-    <div>
+    <div className="w-full justify-around flex">
         <ChatbotForm />
     </div>
   )

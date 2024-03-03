@@ -5,7 +5,7 @@ const DashboardPage = async () => {
     const session = await auth();
     console.log("session", session)
   return (
-    <div>
+    <div className=''>
       <p>{session?.user.name}</p>
       <p>{session?.user.isOAuth}</p>
       {JSON.stringify(session, null, 2)}

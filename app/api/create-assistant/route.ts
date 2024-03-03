@@ -11,7 +11,8 @@ const openai = new OpenAI(openaiOptions);
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { name, description, welcomeMessage, colorScheme, knowledgeBase } = body;
+    const { name, instructions, welcomeMessage, colorScheme, knowledgeBase, logo } = body;
+    
   // retreive the user's session
   const session = await auth();
 
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
     const assistant = await openai.beta.assistants.create({
       name: name,
       instructions:
-       description,
+       instructions,
       tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
     });

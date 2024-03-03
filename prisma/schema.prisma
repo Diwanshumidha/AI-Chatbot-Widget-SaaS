@@ -24,6 +24,7 @@ model User {
   password      String?
   accounts      Account[]
   sessions      Session[]
+  chatbot      Chatbot[]
 }
 
 model VerificationToken {
@@ -33,6 +34,18 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token])
+}
+
+model Chatbot {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  assistantId String @unique
+  chatBotName String
+  instructions String
+  colorScheme String
+  logo String
+  knowledgeBase String
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

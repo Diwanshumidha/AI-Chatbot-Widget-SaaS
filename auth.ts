@@ -32,8 +32,8 @@ export const {
       return true;
     },
     async session({ token, session }) {
-      console.log("token in session", token);
-      console.log("session in session", session);
+      // console.log("token in session", token);
+      // console.log("session in session", session);
       return {
         ...session,
         user: {
@@ -44,7 +44,7 @@ export const {
       };
     },
     async jwt({ token }) {
-      console.log("token in jwt", token);
+      // console.log("token in jwt", token);
       if (!token.sub) return token;
       const existingUser = await getUserById(token.sub);
 

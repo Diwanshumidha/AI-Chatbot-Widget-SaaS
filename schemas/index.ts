@@ -53,12 +53,40 @@ const ColorHsvSchema = z.object({
   a: z.number().min(0).max(1),
 });
 
+function isFileObject(obj: any): obj is File {
+  return (
+    typeof obj[0] === "object" &&
+    obj[0] !== null &&
+    "name" in obj[0] &&
+    "size" in obj[0] &&
+    "type" in obj[0] &&
+    "lastModified" in obj[0]
+  );
+}
+
+// Custom schema for the file object
+const FileObjectSchema = z
+  .custom<File[]>(
+    (value) => {
+      if (isFileObject(value)) {
+        return value;
+      } else {
+        return false;
+      }
+    },
+    { message: "Logo is Required" }
+  )
+  .refine(
+    (val) => val[0]?.type?.startsWith("image/"),
+    "Only Images are supported"
+  );
+  
 export const ChatbotSchema = z.object({
   name: z.string().min(1, {
     message: "Name is required",
   }),
-  description: z.string().min(1, {
-    message: "Description is required",
+  instructions: z.string().min(1, {
+    message: "Instructions are required",
   }),
   welcomeMessage: z.string().min(1, {
     message: "Welcome Message is required",
@@ -68,9 +96,7 @@ export const ChatbotSchema = z.object({
     rgb: ColorRgbSchema,
     hsv: ColorHsvSchema,
   }),
-//   logo: z.string().min(1, {
-//     message: "Logo is required",
-//   }),
+  logo: FileObjectSchema,
   knowledgeBase: z.string().min(1, {
     message: "Knowledge Base is required",
   }),
