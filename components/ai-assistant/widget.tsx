@@ -13,7 +13,6 @@ import { useMessages } from "@/hooks/use-messages";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GoDotFill } from "react-icons/go";
-import { set } from "zod";
 
 const Widget = () => {
   const [chatBox, setChatBox] = useState(false);
