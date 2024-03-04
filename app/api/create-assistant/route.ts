@@ -3,6 +3,7 @@ import OpenAI, { ClientOptions } from "openai";
 import { database } from "@/lib/prismadb";
 import { auth } from "@/auth";
 
+// 
 const openaiOptions: ClientOptions = {
   apiKey: process.env.OPENAI_API_KEY || "",
 };
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, instructions, welcomeMessage, colorScheme, knowledgeBase, logo } = body;
     
-  // retreive the user's session
+  // retrieve the user's session
   const session = await auth();
 
   // If no session is found, return an error message
@@ -22,19 +23,26 @@ export async function POST(request: Request) {
       message: "You are not authorized to perform this action",
     });
   }
+
+  // Destructure the email from the session object
   const { email } = session.user;
 
+  // Check to see if an assistant is already created for the user based on their email
   const checkforAssistant = await database.user.findFirst({
     where: {
       email,
     },
   });
+
   console.log("checkforAssistant", checkforAssistant);
+
+  // If an assistant is already created, return an error message
   if (checkforAssistant?.numberOfAssistants === 1) {
     return NextResponse.json({
       error: "You have reached the maximum number of assistants, please upgrade your account",
     });
   } else {
+    // Create a new assistant if one does not exist
     const assistant = await openai.beta.assistants.create({
       name: name,
       instructions:
@@ -43,6 +51,7 @@ export async function POST(request: Request) {
       model: "gpt-3.5-turbo",
     });
 
+    // Update the user's assistantId and numberOfAssistants in the database
     await database.user.update({
       where: {
         email: email ?? undefined,
@@ -56,5 +65,6 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json({ success: "Assistant created successfully" });
+  // Send a success message to the client
+  return NextResponse.json({ success: "Assistant created successfully"});
 }

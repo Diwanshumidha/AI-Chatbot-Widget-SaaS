@@ -36,8 +36,8 @@ const LoginForm = () => {
   const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
     setLoading(true);
     login(data).then((res) => {
-      if (res.error) {
-        setError(res.error);
+      if (res?.error) {
+        setError(res?.error);
         setLoading(false);
       } else {
         setLoading(false);

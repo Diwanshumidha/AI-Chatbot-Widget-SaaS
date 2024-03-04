@@ -1,0 +1,81 @@
+@keyframes slideRight {
+    0% {
+      transform: translateX(0); /* Start from the left */
+      opacity: 0; /* Start with opacity 0 for fade-out effect */
+    }
+    10% {
+      transform: translateX(50%); /* Move to the right within the container */
+      opacity: 1; /* Fade in */
+    }
+    90% {
+      transform: translateX(50%); /* Hold the position at the right */
+      opacity: 1; /* Stay visible */
+    }
+    100% {
+      transform: translateX(0); /* Reset position to the left */
+      opacity: 0; /* Fade out */
+    }
+  }
+  
+  /* Apply the animation to the element with the `animate-slideRight` class */
+  .slideRight {
+    animation: slideRight 10s linear infinite; /* Adjust the duration as needed */
+    transition: transform 0s linear; /* Smooth transition for resetting */
+  }
+  
+  .wrapper {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 60px 0;
+  }
+  
+  .wrapper:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    content: '';
+    z-index: 2;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0), white);
+  }
+  
+  .wrapper:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    content: '';
+    z-index: 2;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
+  }
+  
+  .logos {
+    display: flex;
+    animation: slide 15s linear infinite;
+  }
+  
+  .logos img {
+    height: 50px;
+    margin: 0 40px;
+  }
+  
+  @keyframes slide {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  @media screen and (max-width: 425px) {
+    .wrapper:before {
+        width: 100px;
+    }
+    .wrapper:after {
+        width: 100px;
+    }
+  }

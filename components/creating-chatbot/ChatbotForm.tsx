@@ -99,28 +99,24 @@ const ChatbotForm = () => {
   };
 
   return (
-    <div className="w-full pt-10 flex lg:flex-row flex-col justify-center container mx-auto">
+    <div className="w-full py-10 flex lg:flex-row flex-col justify-center mx-auto">
       <div className="basis-1/2 px-16 flex-1">
-        <h1 className="text-3xl font-semibold text-center mb-6">
-          Create Your Chatbot in just a few steps
-        </h1>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-2">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Your Chatbot Name</FormLabel>
+                    <FormLabel>Chatbot Name</FormLabel>
                     <FormDescription>
                       Choose a name for your chatbot.
                     </FormDescription>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Chatty Assistant"
+                        placeholder=""
                         type="text"
                       />
                     </FormControl>
@@ -133,14 +129,14 @@ const ChatbotForm = () => {
                 name="instructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Describe your chatbot</FormLabel>
+                    <FormLabel>Give Instructions to Your Chatbot</FormLabel>
                     <FormDescription>
-                      Let your visitors know about your assistant.
+                      This will tell the chatbot how to interact with your users.
                     </FormDescription>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="fun, and bubbly personality "
+                        placeholder=""
                       />
                     </FormControl>
                     <FormMessage />
@@ -159,7 +155,7 @@ const ChatbotForm = () => {
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Hi, I'm Chatty! How can I help you today?"
+                        placeholder=""
                       />
                     </FormControl>
                     <FormMessage />
@@ -249,7 +245,6 @@ const ChatbotForm = () => {
           name={name}
           colorScheme={colorScheme.hex}
           welcomeMessage={welcomeMessage}
-          // logo={logo}
           logoState={logoState}
         />
       </div>
