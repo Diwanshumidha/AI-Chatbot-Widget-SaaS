@@ -13,6 +13,9 @@ import { useMessages } from "@/hooks/use-messages";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GoDotFill } from "react-icons/go";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FormError } from "../auth/form-error";
+import useOnClickOutside from "@/hooks/useOnClickOutside";
 
 const Widget = () => {
   const [chatBox, setChatBox] = useState(false);
@@ -23,53 +26,71 @@ const Widget = () => {
   const { threadId, setThreadId } = useThread();
   const [threadLoading, setThreadLoading] = useState(false);
   const [generationLoading, setGenerationLoading] = useState(false);
+  const [error, setError] = useState<null | string>(null);
 
   // const scrollTriggerRef = useRef<>(null);
-
   const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for the element to scroll to
+  const widgetContainerRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useOnClickOutside(widgetContainerRef, () => {
+    setChatBox(false);
+  });
+
   // Start a conversation/thread with the assistant
   const createThread = async () => {
-    setChatBox(!chatBox);
-    setThreadLoading(true);
-    if (threadId) {
-      setThreadId(threadId)
+    // show chat box
+    try {
+      setError("");
+      setChatBox(!chatBox);
+      if (threadId) {
+        setThreadId(threadId);
+        setShowChat(true);
+        setThreadLoading(false);
+        return;
+      }
+      setThreadLoading(true);
+
+      const response = await fetch("/api/run-assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw Error("Error While Creating the chat");
+      }
+
+      if (!data.thread || !data.welcomeMessage) {
+        throw Error("Error While Creating the chat in welcome");
+      }
+      const thread: string = data.thread;
+      setThreadId(thread);
       setShowChat(true);
+      setMessages((prev) => [
+        ...prev,
+        { from: "chatbot", message: data.welcomeMessage },
+      ]);
+    } catch {
+      setError(
+        "There Was an Error While Loading the ChatBot Refresh The Browser"
+      );
+    } finally {
       setThreadLoading(false);
-      return
-    };
-
-    const response = await fetch("/api/run-assistant", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    });
-
-    const data = await response.json();
-    console.dir(data, {
-      depth: null,
-    });
-    const thread: string = data.thread;
-    setThreadId(thread);
-    setShowChat(true);
-    setMessages((prev) => [
-      ...prev,
-      { from: "chatbot", message: data.welcomeMessage },
-    ]);
-
-    setThreadLoading(false);
+    }
   };
 
   const handleUserMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUserMessage("");
     setGenerationLoading(true);
+
     setMessages((prev) => [...prev, { from: "user", message: userMessage }]);
     const response = await fetch("/api/answer-user", {
       method: "POST",
@@ -103,12 +124,16 @@ const Widget = () => {
         onClick={() => createThread()}
         className="bg-orange-500 p-7 justify-center flex items-center rounded-full hover:bg-orange-500/70"
       >
-        {chatBox ? <IoClose className="w-8 h-8 text-white cursor-pointer" />: <FaRocketchat className="w-8 h-8 text-white cursor-pointer" />}
-        
+        {chatBox ? (
+          <IoClose className="w-8 h-8 text-white cursor-pointer" />
+        ) : (
+          <FaRocketchat className="w-8 h-8 text-white cursor-pointer" />
+        )}
       </Button>
+
       {/* Parent div of the chat box */}
-      {chatBox && !threadLoading && (
-        <div className="bg-white absolute mb-4 break-words flex flex-col bottom-full justify-between right-0 rounded-2xl w-96 h-[60dvh]">
+      {chatBox && (
+        <div ref={widgetContainerRef} className="bg-white absolute mb-4 break-words flex flex-col bottom-full justify-between shadow-lg right-0 rounded-2xl w-96 h-[60dvh]">
           {/* Start of orange header for chatbox */}
           <div className="justify-between p-3 flex items-center bg-orange-500 rounded-t-2xl rounded-b-none text-white">
             <div className="flex items-center">
@@ -128,12 +153,18 @@ const Widget = () => {
               />
             </div>
           </div>
+          {threadLoading && messages.length <= 0 ? <WidgetLoader /> : null}
+          {error ? (
+            <div className=" px-4 py-2">
+              <FormError message={error} />
+            </div>
+          ) : null}
           {/* Parent element for the chat area below orange header */}
           <ScrollArea className="h-full w-full mt-6 space-y-2 py-2 text-sm">
-            {showChat &&
+            {
               messages.map((message, index) => (
                 <div
-                  key={index}
+                  key={`LoadingPointsWidget-${index}`}
                   className={cn(
                     "flex flex-1 px-4",
                     message?.from === "user"
@@ -161,7 +192,7 @@ const Widget = () => {
                   </div>
                 </div>
               ))}
-              {/* The loader for when the Assistant API is thinking of an answer */}
+            {/* The loader for when the Assistant API is thinking of an answer */}
             {generationLoading && (
               <div className="px-4">
                 <p className="flex break-words py-1 text-start rounded-lg mb-2 w-1/3 text-slate-500 text-sm">
@@ -190,24 +221,10 @@ const Widget = () => {
                 placeholder="Message..."
                 aria-label="Type here"
               />
-              <Button type="submit" className="border-s-0">
+              <Button type="submit" className="border-s-0" disabled={!threadId}>
                 <LuArrowUpRight size={25} />
               </Button>
             </form>
-          )}
-          {threadLoading && (
-            <div className="bg-white absolute mb-4 break-words flex flex-col bottom-full justify-between right-0 rounded-2xl w-96 h-[60dvh]">
-              <div className="px-4">
-                <p className="flex break-words py-1 text-start rounded-lg mb-2 w-1/3 text-slate-500 text-sm">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <GoDotFill
-                      className={`animate-bounce delay-${index * 100} `}
-                      size={18}
-                    />
-                  ))}
-                </p>
-              </div>
-            </div>
           )}
         </div>
       )}
@@ -216,3 +233,11 @@ const Widget = () => {
 };
 
 export default Widget;
+
+const WidgetLoader = () => {
+  return (
+    <div className=" w-full flex flex-col gap-2 mt-6 px-4 py-2">
+      <Skeleton className=" w-3/4 h-[24px] self-start" />
+    </div>
+  );
+};

@@ -36,15 +36,26 @@ model VerificationToken {
   @@unique([email, token])
 }
 
+// model Logo {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+//   url String 
+//   fileId String
+//   chatbotId String @db.ObjectId @unique
+//   chatbot Chatbot @relation(fields: [chatbotId], references: [logoId]) 
+// }
+
 model Chatbot {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   assistantId String @unique
+  welcomeMessage String
   chatBotName String
   instructions String
   colorScheme String
-  logo String
-  knowledgeBase String
+  logoUrl String
+  logoFileId String
+
+
 user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

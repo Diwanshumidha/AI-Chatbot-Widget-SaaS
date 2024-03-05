@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import OpenAI, { ClientOptions } from "openai";
 import { database } from "@/lib/prismadb";
 import { auth } from "@/auth";
+import { utapi } from "@/server/uploadthing";
 
-// 
 const openaiOptions: ClientOptions = {
   apiKey: process.env.OPENAI_API_KEY || "",
 };
@@ -11,9 +11,29 @@ const openaiOptions: ClientOptions = {
 const openai = new OpenAI(openaiOptions);
 
 export async function POST(request: Request) {
-    const body = await request.json();
-    const { name, instructions, welcomeMessage, colorScheme, knowledgeBase, logo } = body;
-    
+  const formData = await request.formData();
+  // const formData = await request.formData();
+  console.log(formData);
+  const name = formData.get("name") as string;
+  const instructions = formData.get("instructions") as string;
+  const logo = formData.get("logo") as File;
+  const colorScheme = formData.get("colorScheme") as string;
+  const knowledgeBase = Array.from(formData.getAll("knowledgeBase") as File[]);
+  const welcomeMessage = formData.get("welcomeMessage") as string;
+  console.log("knowledgeBase", knowledgeBase);
+  console.log("logo", logo);
+
+  // TODO: Validator
+
+  const uploadedLogo = await utapi.uploadFiles(logo);
+  if (uploadedLogo.error) {
+    return;
+  }
+  if (!uploadedLogo.data.url || !uploadedLogo.data.key) {
+    return;
+  }
+  // const knowledgeBaseFile = await utapi.uploadFiles(knowledgeBase);
+
   // retrieve the user's session
   const session = await auth();
 
@@ -39,20 +59,31 @@ export async function POST(request: Request) {
   // If an assistant is already created, return an error message
   if (checkforAssistant?.numberOfAssistants === 1) {
     return NextResponse.json({
-      error: "You have reached the maximum number of assistants, please upgrade your account",
+      error:
+        "You have reached the maximum number of assistants, please upgrade your account",
     });
   } else {
+    let files: string[] = [];
+    for (const file of knowledgeBase) {
+      const currentfile = await openai.files.create({
+        file,
+        purpose: "assistants",
+      });
+      files.push(currentfile.id);
+    }
+
     // Create a new assistant if one does not exist
     const assistant = await openai.beta.assistants.create({
-      name: name,
-      instructions:
-       instructions,
+      name: name as string,
+      instructions: instructions as string,
       tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
+      file_ids: files,
     });
 
+    console.log(assistant);
     // Update the user's assistantId and numberOfAssistants in the database
-    await database.user.update({
+    const user = await database.user.update({
       where: {
         email: email ?? undefined,
       },
@@ -63,8 +94,24 @@ export async function POST(request: Request) {
         assistantId: assistant.id,
       },
     });
+
+    // Create a new chatbot in the database
+    const chatbot = await database.chatbot.create({
+      data: {
+        chatBotName: name,
+        instructions: instructions,
+        welcomeMessage: welcomeMessage,
+        colorScheme: colorScheme,
+        assistantId: assistant.id,
+        userId: user.id,
+        logoUrl:uploadedLogo.data?.url,
+        logoFileId: uploadedLogo.data?.key
+      }
+    });
+
+    console.log("chatbot", chatbot);
   }
 
   // Send a success message to the client
-  return NextResponse.json({ success: "Assistant created successfully"});
+  return NextResponse.json({ success: "Assistant created successfully" });
 }

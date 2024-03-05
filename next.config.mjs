@@ -3,6 +3,7 @@ const nextConfig = {
     images: {
         domains: ["C:\fakepath"]
     }
+    
 };
 
 export default nextConfig;

@@ -10,24 +10,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
 import { ChatbotSchema } from "@/schemas";
 import ChatbotPrototype from "./ChatbotPrototype";
 import { ColorPicker, useColor } from "react-color-palette";
 import "react-color-palette/css";
-import { redirect } from "next/navigation";
+import axios from "axios";
 
 const ChatbotForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const { pending } = useFormStatus();
   const [logoState, setLogoState] = useState("");
   const [color, setColor] = useColor("#121212");
 
@@ -54,11 +51,13 @@ const ChatbotForm = () => {
         },
       },
       logo: undefined,
-      knowledgeBase: "",
+      knowledgeBase: undefined,
     },
   });
 
-  const { watch, setValue, register } = form;
+  const { watch, setValue, register, formState } = form;
+
+ 
 
   const uploadingLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -80,22 +79,27 @@ const ChatbotForm = () => {
 
   const onSubmit = async (data: z.infer<typeof ChatbotSchema>) => {
     console.log(data);
-    await fetch("/api/create-assistant", {
-      method: "POST",
-      body: JSON.stringify(data),
+    const formdata = new FormData();
+    formdata.append("logo", data.logo[0]);
+    formdata.append("name", data.name);
+    formdata.append("instructions", data.instructions);
+    formdata.append("welcomeMessage", data.welcomeMessage);
+    for (let index = 0; index < data.knowledgeBase.length; index++) {
+      const file = data.knowledgeBase[index];
+      formdata.append(`knowledgeBase`, file);
+    }
+    formdata.append("colorScheme", data.colorScheme.hex);
+    console.log(formdata);
+    const response = await axios.post("/api/create-assistant", formdata, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setSuccess(data.success);
-          redirect("/dashboard/assistant");
-        }
-      });
+    });
+    if (response.data.error) {
+      setError(response.data.error);
+    } else {
+      setSuccess(response.data.success);
+    }
   };
 
   return (
@@ -114,11 +118,7 @@ const ChatbotForm = () => {
                       Choose a name for your chatbot.
                     </FormDescription>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder=""
-                        type="text"
-                      />
+                      <Input {...field} placeholder="" type="text" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,13 +131,11 @@ const ChatbotForm = () => {
                   <FormItem>
                     <FormLabel>Give Instructions to Your Chatbot</FormLabel>
                     <FormDescription>
-                      This will tell the chatbot how to interact with your users.
+                      This will tell the chatbot how to interact with your
+                      users.
                     </FormDescription>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder=""
-                      />
+                      <Input {...field} placeholder="" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -153,10 +151,7 @@ const ChatbotForm = () => {
                       This will be the first message your visitors see.
                     </FormDescription>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder=""
-                      />
+                      <Input {...field} placeholder="" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -217,7 +212,12 @@ const ChatbotForm = () => {
                     </FormDescription>
 
                     <FormControl>
-                      <Input {...field} type="file" multiple />
+                      <Input
+                        {...register("knowledgeBase")}
+                        type="file"
+                        // accept="image/*"
+                        multiple
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -225,7 +225,7 @@ const ChatbotForm = () => {
               />
             </div>
             {success && (
-              <p className="text-green-500 bg-green-500/70 p-2 rounded-lg">
+              <p className="text-green-500 bg-green-500/20 p-2 rounded-lg">
                 {success}
               </p>
             )}
@@ -234,8 +234,8 @@ const ChatbotForm = () => {
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? "Loading..." : "Create Your Chatbot"}
+            <Button type="submit" className="w-full" disabled={formState.isSubmitting || formState.isDirty}>
+              {formState.isSubmitting ? "Loading..." : "Create Your Chatbot"}
             </Button>
           </form>
         </Form>
