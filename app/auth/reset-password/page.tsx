@@ -1,9 +1,13 @@
-import CreateNewPasswordForm from "@/components/auth/create-new-password-form"
 
+import { Suspense } from "react"
+import CreateNewPasswordForm from "@/components/auth/create-new-password-form"
 
 const ResetNewPasswordPage = () => {
   return (
-    <CreateNewPasswordForm />
+    <Suspense>
+        <CreateNewPasswordForm />
+    </Suspense>
+  
   )
 }
 
