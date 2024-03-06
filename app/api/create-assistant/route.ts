@@ -3,6 +3,7 @@ import OpenAI, { ClientOptions } from "openai";
 import { database } from "@/lib/prismadb";
 import { auth } from "@/auth";
 import { utapi } from "@/server/uploadthing";
+import {v4 as uuid} from "uuid";
 
 const openaiOptions: ClientOptions = {
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -94,6 +95,7 @@ export async function POST(request: Request) {
         assistantId: assistant.id,
       },
     });
+    
 
     // Create a new chatbot in the database
     const chatbot = await database.chatbot.create({
@@ -102,16 +104,17 @@ export async function POST(request: Request) {
         instructions: instructions,
         welcomeMessage: welcomeMessage,
         colorScheme: colorScheme,
+        apiKey: uuid(),
         assistantId: assistant.id,
         userId: user.id,
-        logoUrl:uploadedLogo.data?.url,
-        logoFileId: uploadedLogo.data?.key
-      }
+        logoUrl: uploadedLogo.data?.url,
+        logoFileId: uploadedLogo.data?.key,
+      },
     });
 
     console.log("chatbot", chatbot);
+    return NextResponse.json({ success: "Assistant created successfully", apiKey:chatbot.apiKey });
   }
 
-  // Send a success message to the client
-  return NextResponse.json({ success: "Assistant created successfully" });
+ 
 }

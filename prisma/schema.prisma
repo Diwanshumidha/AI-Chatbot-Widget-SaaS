@@ -50,6 +50,7 @@ model Chatbot {
   assistantId String @unique
   welcomeMessage String
   chatBotName String
+  apiKey String
   instructions String
   colorScheme String
   logoUrl String

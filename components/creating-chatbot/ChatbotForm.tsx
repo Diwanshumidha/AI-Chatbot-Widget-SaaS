@@ -234,7 +234,7 @@ const ChatbotForm = () => {
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={formState.isSubmitting || formState.isDirty}>
+            <Button type="submit" className="w-full" disabled={formState.isSubmitting}>
               {formState.isSubmitting ? "Loading..." : "Create Your Chatbot"}
             </Button>
           </form>
@@ -253,3 +253,20 @@ const ChatbotForm = () => {
 };
 
 export default ChatbotForm;
+
+
+
+
+{/* <script type="text/javascript">
+  (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        window.voiceflow.chat.load({
+          verify: { projectID: '655e9a9073f76b00076ed256' },
+          url: 'https://general-runtime.voiceflow.com',
+          versionID: 'production'
+        });
+      }
+      v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+  })(document, 'script');
+</script> */}

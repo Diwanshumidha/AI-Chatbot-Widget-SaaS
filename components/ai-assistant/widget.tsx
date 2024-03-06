@@ -21,7 +21,6 @@ const Widget = () => {
   const [chatBox, setChatBox] = useState(false);
   const { messages, setMessages } = useMessages();
   const [userMessage, setUserMessage] = useState("");
-  const [assistantMessage, setAssistantMessage] = useState("");
   const [showChat, setShowChat] = useState(false);
   const { threadId, setThreadId } = useThread();
   const [threadLoading, setThreadLoading] = useState(false);
