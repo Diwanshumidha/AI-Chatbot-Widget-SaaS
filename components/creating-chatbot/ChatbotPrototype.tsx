@@ -45,6 +45,7 @@ const ChatbotPrototype = ({
                 <p className="flex break-words py-1 text-start rounded-lg mb-2 w-1/3 text-slate-500 text-sm">
                   {Array.from({ length: 3 }).map((_, index) => (
                     <GoDotFill
+                      key={`LoaderProto-${index}`}
                       className={`animate-bounce delay-${index * 100} `}
                       size={18}
                     />

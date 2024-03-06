@@ -36,7 +36,8 @@ const NewVerificationForm = () => {
       .catch(() => {
         setError("An error occurred");
       });
-  }, [token]);
+  
+  }, [token]); 
 
   useEffect(() => {
     onSubmit();

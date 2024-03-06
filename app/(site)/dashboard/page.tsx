@@ -15,7 +15,7 @@ const DashboardPage = async () => {
             Hello {session?.user.name},
           </h2>
           <p className="text-muted-foreground mt-1">
-            This is what we've got for you today.
+            This is what we&apos;ve got for you today.
           </p>
         </div>
         <Link href="/dashboard/create-chatbot">
